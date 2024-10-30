@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat com WebSocket</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background-color: #f0f2f5;
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+    }
+    #chat {
+      width: 80%;
+      max-width: 600px;
+      height: 70%;
+      border: 1px solid #ddd;
+      background-color: #fff;
+      overflow-y: auto;
+      margin-top: 20px;
+      padding: 10px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    .message {
+      margin: 5px 0;
+      padding: 8px;
+      border-radius: 4px;
+      background-color: #e9e9e9;
+    }
+    #inputArea {
+      width: 80%;
+      max-width: 600px;
+      display: flex;
+      margin-top: 10px;
+    }
+    #messageInput {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px 0 0 4px;
+    }
+    #sendButton {
+      padding: 10px 20px;
+      border: none;
+      background-color: #007bff;
+      color: white;
+      cursor: pointer;
+      border-radius: 0 4px 4px 0;
+    }
+    #sendButton:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <h2>Chat com WebSocket</h2>
+  <div id="chat"></div>
+  <div id="inputArea">
+    <input type="text" id="messageInput" placeholder="Digite sua mensagem">
+    <button id="sendButton">Enviar</button>
+  </div>
+
+  <script>
+    const socket = new WebSocket("ws://localhost:8080");
+    const chat = document.getElementById("chat");
+    const messageInput = document.getElementById("messageInput");
+    const sendButton = document.getElementById("sendButton");
+
+    // Pergunta o nome do usuário assim que a conexão é estabelecida
+    socket.onopen = () => {
+      const nomeUsuario = prompt("Digite seu nome de usuário:");
+      socket.send(nomeUsuario);
+    };
+
+    // Exibe as mensagens recebidas do servidor no chat
+    socket.onmessage = (event) => {
+      const message = document.createElement("div");
+      message.classList.add("message");
+      message.textContent = event.data;
+      chat.appendChild(message);
+      chat.scrollTop = chat.scrollHeight; // Scroll automático para a última mensagem
+    };
+
+    // Envia a mensagem do usuário para o servidor quando clicar no botão
+    sendButton.addEventListener("click", () => {
+      const message = messageInput.value;
+      if (message) {
+        socket.send(message);
+        messageInput.value = "";
+      }
+    });
+
+    // Permite enviar a mensagem pressionando "Enter"
+    messageInput.addEventListener("keypress", (event) => {
+      if (event.key === "Enter") {
+        sendButton.click();
+      }
+    });
+  </script>
+</body>
+</html>

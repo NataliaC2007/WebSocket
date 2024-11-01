@@ -8,44 +8,12 @@
 </head>
 <body>
   <h2>Chat</h2>
-  <div id="chat"></div>
+  <div id="chat" style="height: 300px; overflow-y: auto;"></div>
   <div id="inputArea">
     <input type="text" id="messageInput" placeholder="Digite sua mensagem">
     <button id="sendButton">Enviar</button>
   </div>
-
-  <script>
-    const socket = new WebSocket("ws://localhost:8080");
-    const chat = document.getElementById("chat");
-    const messageInput = document.getElementById("messageInput");
-    const sendButton = document.getElementById("sendButton");
-
-    socket.onopen = () => {
-      const nomeUsuario = prompt("Digite seu nome de usuário:");
-      socket.send(nomeUsuario);
-    };
-
-    socket.onmessage = (event) => {
-      const message = document.createElement("div");
-      message.classList.add("message");
-      message.textContent = event.data;
-      chat.appendChild(message);
-      chat.scrollTop = chat.scrollHeight; 
-    };
-
-    sendButton.addEventListener("click", () => {
-      const message = messageInput.value;
-      if (message) {
-        socket.send(message);
-        messageInput.value = "";
-      }
-    });
-
-    messageInput.addEventListener("keypress", (event) => {
-      if (event.key === "Enter") {
-        sendButton.click();
-      }
-    });
-  </script>
+  <div id="userList">Usuários conectados: </div>
+  <script src="main.js"></script>
 </body>
 </html>

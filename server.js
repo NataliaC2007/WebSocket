@@ -1,10 +1,10 @@
 const WebSocket = require('ws');
 
 const server = new WebSocket.Server({ port: 3002 });
-const clientes = new Map(); 
+const clientes = new Map();
 
 server.on('connection', (ws) => {
-  let isRegistered = false; 
+  let isRegistered = false;
 
   const askForUsername = () => {
     ws.send('Digite seu nome de usuário:');
@@ -16,10 +16,11 @@ server.on('connection', (ws) => {
     if (!isRegistered) {
       if (Array.from(clientes.values()).includes(mensagem)) {
         ws.send('Nome de usuário já em uso. Por favor, escolha outro.');
-        return; 
-
+        return;
+      }
+      
       clientes.set(ws, mensagem);
-      isRegistered = true; 
+      isRegistered = true;
       enviarMensagemParaTodos(`${mensagem} entrou no chat!`);
       atualizarListaUsuarios();
     } else {
@@ -30,12 +31,13 @@ server.on('connection', (ws) => {
   ws.on('close', () => {
     const usuario = clientes.get(ws);
     if (usuario) {
-      clientes.delete(ws); 
+      clientes.delete(ws);
       enviarMensagemParaTodos(`${usuario} saiu do chat.`);
       atualizarListaUsuarios();
     }
   });
 });
+
 function enviarMensagemParaTodos(mensagem) {
   clientes.forEach((_, cliente) => {
     if (cliente.readyState === WebSocket.OPEN) {
